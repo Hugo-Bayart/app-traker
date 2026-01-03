@@ -57,7 +57,7 @@ export function Insights() {
 
   const chartData = {
     labels: dates.map(d => {
-      const [y, m, day] = d.split('-');
+      const [_y, m, day] = d.split('-');
       return `${day}/${m}`;
     }),
     datasets: [

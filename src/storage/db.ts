@@ -25,7 +25,7 @@ export async function getDB() {
 
   dbInstance = await openDB<GoalTrackerDB>('goal-tracker', 1, {
     upgrade(db) {
-      const finalGoalsStore = db.createObjectStore('finalGoals', { keyPath: 'id' });
+      db.createObjectStore('finalGoals', { keyPath: 'id' });
       
       const dailyGoalsStore = db.createObjectStore('dailyGoals', { keyPath: 'id' });
       dailyGoalsStore.createIndex('by-final-goal', 'finalGoalId');

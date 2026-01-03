@@ -18,7 +18,6 @@ export function Goals() {
   const [newDailyGoalTitle, setNewDailyGoalTitle] = useState('');
   const [newDailyGoalPillar, setNewDailyGoalPillar] = useState<Pillar>('Business');
   const [newDailyGoalWeight, setNewDailyGoalWeight] = useState(3);
-  const [filterPillar, setFilterPillar] = useState<Pillar | 'All'>('All');
 
   useEffect(() => {
     loadGoals();
@@ -120,10 +119,6 @@ export function Goals() {
       loadGoals();
     }
   }
-
-  const filteredDailyGoals = filterPillar === 'All' 
-    ? dailyGoals 
-    : dailyGoals.filter(g => g.pillar === filterPillar);
 
   return (
     <div className="goals-page">
