@@ -22,3 +22,18 @@ export interface DailyEntry {
   note?: string;
   validated?: boolean;
 }
+
+export interface RoadmapPhase {
+  id: string;
+  title: string;
+  country: string;
+  duration: string;
+  order: number;
+}
+
+export interface RoadmapItem {
+  id: string;
+  phaseId: string;
+  title: string;
+  completed: boolean;
+}

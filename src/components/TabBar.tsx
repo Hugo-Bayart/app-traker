@@ -8,6 +8,7 @@ export function TabBar() {
     { path: '/', label: 'Objectifs', icon: '🎯' },
     { path: '/today', label: "Aujourd'hui", icon: '✓' },
     { path: '/insights', label: 'Suivi', icon: '📊' },
+    { path: '/frise', label: 'Frise', icon: '📍' },
   ];
 
   return (

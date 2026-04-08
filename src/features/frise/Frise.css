@@ -1,0 +1,160 @@
+.frise-page {
+  padding: 20px 20px 100px 20px;
+}
+
+.frise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.frise-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.global-stats {
+  text-align: center;
+}
+
+.progress-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.phases-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.frise-phase-card {
+  overflow: hidden;
+}
+
+.frise-phase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  background: #f9fafb;
+  border-radius: 12px;
+  user-select: none;
+}
+
+.frise-phase-header:hover {
+  background: #f3f4f6;
+}
+
+.phase-info {
+  flex: 1;
+  text-align: left;
+}
+
+.frise-phase-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.phase-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.phase-country {
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.phase-duration {
+  color: #9ca3af;
+}
+
+.phase-progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: 16px;
+}
+
+.progress-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  min-width: 50px;
+  text-align: right;
+}
+
+.expand-icon {
+  font-size: 20px;
+  color: #6366f1;
+  font-weight: 700;
+  width: 24px;
+  text-align: center;
+}
+
+.frise-phase-items {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.phase-progress-bar {
+  margin-bottom: 16px;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.frise-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.frise-item:hover {
+  background: #f3f4f6;
+}
+
+.frise-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.item-title {
+  flex: 1;
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.frise-item.completed .item-title {
+  opacity: 0.6;
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+.frise-item input[type="checkbox"]:checked {
+  accent-color: #6366f1;
+}
