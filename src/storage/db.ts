@@ -32,20 +32,24 @@ let dbInstance: IDBPDatabase<GoalTrackerDB> | null = null;
 export async function getDB() {
   if (dbInstance) return dbInstance;
 
-  dbInstance = await openDB<GoalTrackerDB>('goal-tracker', 1, {
-    upgrade(db) {
-      db.createObjectStore('finalGoals', { keyPath: 'id' });
+  dbInstance = await openDB<GoalTrackerDB>('goal-tracker', 2, {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        db.createObjectStore('finalGoals', { keyPath: 'id' });
 
-      const dailyGoalsStore = db.createObjectStore('dailyGoals', { keyPath: 'id' });
-      dailyGoalsStore.createIndex('by-final-goal', 'finalGoalId');
+        const dailyGoalsStore = db.createObjectStore('dailyGoals', { keyPath: 'id' });
+        dailyGoalsStore.createIndex('by-final-goal', 'finalGoalId');
 
-      const dailyEntriesStore = db.createObjectStore('dailyEntries', { keyPath: 'id' });
-      dailyEntriesStore.createIndex('by-date', 'date');
+        const dailyEntriesStore = db.createObjectStore('dailyEntries', { keyPath: 'id' });
+        dailyEntriesStore.createIndex('by-date', 'date');
+      }
 
-      db.createObjectStore('roadmapPhases', { keyPath: 'id' });
+      if (oldVersion < 2) {
+        db.createObjectStore('roadmapPhases', { keyPath: 'id' });
 
-      const roadmapItemsStore = db.createObjectStore('roadmapItems', { keyPath: 'id' });
-      roadmapItemsStore.createIndex('by-phase', 'phaseId');
+        const roadmapItemsStore = db.createObjectStore('roadmapItems', { keyPath: 'id' });
+        roadmapItemsStore.createIndex('by-phase', 'phaseId');
+      }
     },
   });
 
