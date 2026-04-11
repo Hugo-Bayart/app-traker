@@ -178,14 +178,43 @@ export async function getRoadmapPhases(): Promise<RoadmapPhase[]> {
   return db.getAll('roadmapPhases');
 }
 
+export async function addRoadmapPhase(phase: RoadmapPhase): Promise<void> {
+  const db = await getDB();
+  await db.add('roadmapPhases', phase);
+}
+
+export async function updateRoadmapPhase(phase: RoadmapPhase): Promise<void> {
+  const db = await getDB();
+  await db.put('roadmapPhases', phase);
+}
+
+export async function deleteRoadmapPhase(id: string): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction(['roadmapPhases', 'roadmapItems'], 'readwrite');
+  await tx.objectStore('roadmapPhases').delete(id);
+  const itemKeys = await tx.objectStore('roadmapItems').index('by-phase').getAllKeys(id);
+  await Promise.all(itemKeys.map(key => tx.objectStore('roadmapItems').delete(key)));
+  await tx.done;
+}
+
 export async function getRoadmapItemsByPhase(phaseId: string): Promise<RoadmapItem[]> {
   const db = await getDB();
   return db.getAllFromIndex('roadmapItems', 'by-phase', phaseId);
 }
 
+export async function addRoadmapItem(item: RoadmapItem): Promise<void> {
+  const db = await getDB();
+  await db.add('roadmapItems', item);
+}
+
 export async function updateRoadmapItem(item: RoadmapItem): Promise<void> {
   const db = await getDB();
   await db.put('roadmapItems', item);
+}
+
+export async function deleteRoadmapItem(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('roadmapItems', id);
 }
 
 export async function getRoadmapItems(): Promise<RoadmapItem[]> {
