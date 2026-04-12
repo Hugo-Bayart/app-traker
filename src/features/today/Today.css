@@ -235,3 +235,172 @@
     transform: translateY(0);
   }
 }
+
+/* ── New Today styles ── */
+.today-score-section {
+  padding: 0 20px 4px;
+}
+
+.today-score-bar {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--clr-border);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.today-score-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: var(--clr-primary);
+  transition: width 0.4s ease;
+}
+
+.today-score-text {
+  font-size: 12px;
+  color: var(--clr-text-secondary);
+  font-weight: 600;
+}
+
+.today-groups {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.today-group {
+  background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md, 14px);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.today-group--done {
+  border-color: var(--clr-accent1);
+}
+
+.today-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.today-group-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--clr-text);
+  font-family: var(--font-title, 'Inter', sans-serif);
+  text-transform: var(--title-transform, none);
+}
+
+.today-group-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--clr-text-secondary);
+  font-family: var(--font-data, 'Inter', sans-serif);
+}
+
+.today-checklist {
+  display: flex;
+  flex-direction: column;
+}
+
+.today-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--clr-border);
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.today-checklist-item:last-child {
+  border-bottom: none;
+}
+
+.today-checklist-item.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.today-check-icon {
+  color: var(--clr-text-secondary);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.today-checklist-item.done .today-check-icon {
+  color: var(--clr-primary);
+}
+
+.today-action-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--clr-text);
+  flex: 1;
+}
+
+.today-checklist-item.done .today-action-title {
+  text-decoration: line-through;
+  color: var(--clr-text-secondary);
+}
+
+.today-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--clr-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.today-empty p {
+  margin: 0 0 6px;
+}
+
+.today-note-section {
+  padding: 16px 20px;
+}
+
+.today-note-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--clr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.today-note-input {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md, 14px);
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.today-note-input:focus {
+  outline: none;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light, rgba(99,102,241,0.12));
+}
+
+.today-note-input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

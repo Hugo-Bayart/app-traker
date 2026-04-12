@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/Button';
-import { Modal } from '../../components/Modal';
+import { Goal, DailyAction, ActionCompletion, MeasureType } from '../../types';
 import {
-  getFinalGoals, addFinalGoal, updateFinalGoal, deleteFinalGoal,
-  getDailyGoalsByFinalGoal, addDailyGoal, updateDailyGoal, deleteDailyGoal,
-  getDailyEntriesInRange,
+  getGoals,
+  getAllDailyActions,
+  getActionCompletionsInRange,
 } from '../../storage/db';
-import { FinalGoal, DailyGoal, Pillar, DailyEntry } from '../../types';
-import { PencilIcon, TrashIcon } from '../../components/Icons';
+import { GoalCreateModal } from './GoalCreateModal';
 import './Goals.css';
 
 const USER_NAME_KEY = 'goal-tracker-username';
+
+const TYPE_INFO: Record<MeasureType, { abbr: string; color: string }> = {
+  weight:      { abbr: 'KG', color: '#3B82F6' },
+  savings:     { abbr: '€',  color: '#10B981' },
+  distance:    { abbr: 'KM', color: '#F59E0B' },
+  time:        { abbr: 'H',  color: '#8B5CF6' },
+  count:       { abbr: '#',  color: '#6B7280' },
+  custom:      { abbr: '~',  color: '#14B8A6' },
+  qualitative: { abbr: 'OK', color: '#EF4444' },
+};
 
 function getAccentVar(pct: number): string {
   if (pct >= 66) return 'var(--clr-accent1)';
@@ -19,17 +27,37 @@ function getAccentVar(pct: number): string {
   return 'var(--clr-accent3)';
 }
 
-function computeStreak(entries: DailyEntry[]): number {
-  const validated = new Set(entries.filter(e => e.validated).map(e => e.date));
-  let streak = 0;
-  const d = new Date();
-  while (true) {
-    const dateStr = d.toISOString().split('T')[0];
-    if (!validated.has(dateStr)) break;
-    streak++;
-    d.setUTCDate(d.getUTCDate() - 1);
+function toDateStr(d: Date = new Date()): string {
+  return d.toISOString().split('T')[0];
+}
+
+function computeGoalProgress(goal: Goal, actions: DailyAction[], completions: ActionCompletion[]): number {
+  if (goal.measureType === 'qualitative') {
+    if (actions.length === 0) return 0;
+    const start = new Date(goal.createdAt);
+    start.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = Math.floor((today.getTime() - start.getTime()) / 86400000) + 1;
+    let complete = 0;
+    for (let i = 0; i < days; i++) {
+      const d = new Date(start);
+      d.setDate(d.getDate() + i);
+      const ds = toDateStr(d);
+      const dayComps = completions.filter(c => c.date === ds && c.completed);
+      if (actions.every(a => dayComps.some(c => c.actionId === a.id))) complete++;
+    }
+    return days > 0 ? Math.min(100, Math.round((complete / days) * 100)) : 0;
   }
-  return streak;
+  if (goal.startValue === undefined || goal.targetValue === undefined || goal.currentValue === undefined) return 0;
+  if (goal.startValue === goal.targetValue) return 100;
+  let pct: number;
+  if (goal.measureType === 'weight' && goal.weightDirection === 'lose') {
+    pct = (goal.startValue - goal.currentValue) / (goal.startValue - goal.targetValue) * 100;
+  } else {
+    pct = (goal.currentValue - goal.startValue) / (goal.targetValue - goal.startValue) * 100;
+  }
+  return Math.min(100, Math.max(0, Math.round(pct)));
 }
 
 function GearIcon() {
@@ -52,141 +80,59 @@ function FlameIcon() {
 export function Goals() {
   const navigate = useNavigate();
   const [userName] = useState(() => localStorage.getItem(USER_NAME_KEY) || '');
-  const [finalGoals, setFinalGoals] = useState<FinalGoal[]>([]);
-  const [dailyGoalsByFinal, setDailyGoalsByFinal] = useState<Map<string, DailyGoal[]>>(new Map());
-  const [goalProgress, setGoalProgress] = useState<Map<string, number>>(new Map());
-  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [allActions, setAllActions] = useState<DailyAction[]>([]);
+  const [recentCompletions, setRecentCompletions] = useState<ActionCompletion[]>([]);
+  const [progressMap, setProgressMap] = useState<Map<string, number>>(new Map());
   const [streak, setStreak] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState<FinalGoal | null>(null);
-  const [editingDailyGoal, setEditingDailyGoal] = useState<DailyGoal | null>(null);
-  const [selectedFinalGoal, setSelectedFinalGoal] = useState<string | null>(null);
-  const [newGoalTitle, setNewGoalTitle] = useState('');
-  const [newDailyGoalTitle, setNewDailyGoalTitle] = useState('');
-  const [newDailyGoalPillar, setNewDailyGoalPillar] = useState<Pillar>('Business');
-  const [newDailyGoalWeight, setNewDailyGoalWeight] = useState(3);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  useEffect(() => { loadGoals(); }, []);
+  useEffect(() => { loadData(); }, []);
 
-  async function loadGoals() {
-    const finals = await getFinalGoals();
-    setFinalGoals(finals);
+  async function loadData() {
+    const rangeStart = toDateStr(new Date(Date.now() - 365 * 24 * 60 * 60 * 1000));
+    const rangeEnd = toDateStr();
+    const [fetchedGoals, fetchedActions, completions] = await Promise.all([
+      getGoals(),
+      getAllDailyActions(),
+      getActionCompletionsInRange(rangeStart, rangeEnd),
+    ]);
+    setGoals(fetchedGoals);
+    setAllActions(fetchedActions);
+    setRecentCompletions(completions);
 
-    const byFinal = new Map<string, DailyGoal[]>();
-    for (const fg of finals) {
-      byFinal.set(fg.id, await getDailyGoalsByFinalGoal(fg.id));
+    // Streak: consecutive days with at least 1 completed action from today backwards
+    const daysWithActivity = new Set(completions.filter(c => c.completed).map(c => c.date));
+    let s = 0;
+    const d = new Date();
+    while (daysWithActivity.has(toDateStr(d))) {
+      s++;
+      d.setDate(d.getDate() - 1);
     }
-    setDailyGoalsByFinal(byFinal);
+    setStreak(s);
 
-    const end = new Date().toISOString().split('T')[0];
-    const start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const entries = await getDailyEntriesInRange(start, end);
-    setStreak(computeStreak(entries));
-
-    const validated = entries.filter(e => e.validated);
+    // Progress per goal
     const prog = new Map<string, number>();
-    for (const fg of finals) {
-      const dgs = byFinal.get(fg.id) ?? [];
-      if (!dgs.length || !validated.length) { prog.set(fg.id, 0); continue; }
-      let possible = 0, earned = 0;
-      for (const e of validated) {
-        for (const dg of dgs) {
-          possible += dg.weight;
-          if (e.completedGoalIds.includes(dg.id)) earned += dg.weight;
-        }
-      }
-      prog.set(fg.id, possible > 0 ? Math.round((earned / possible) * 100) : 0);
+    for (const goal of fetchedGoals) {
+      const actions = fetchedActions.filter(a => a.goalId === goal.id);
+      const comps = completions.filter(c => c.goalId === goal.id);
+      prog.set(goal.id, computeGoalProgress(goal, actions, comps));
     }
-    setGoalProgress(prog);
+    setProgressMap(prog);
   }
 
-  function openAddFinalGoal() {
-    setEditingGoal(null);
-    setNewGoalTitle('');
-    setIsModalOpen(true);
+  function todayDone(goalId: string): number {
+    const today = toDateStr();
+    return recentCompletions.filter(c => c.goalId === goalId && c.date === today && c.completed).length;
   }
 
-  function openEditFinalGoal(goal: FinalGoal) {
-    setEditingGoal(goal);
-    setNewGoalTitle(goal.title);
-    setIsModalOpen(true);
+  function todayTotal(goalId: string): number {
+    return allActions.filter(a => a.goalId === goalId).length;
   }
 
-  async function saveFinalGoal() {
-    if (!newGoalTitle.trim()) return;
-    if (editingGoal) {
-      await updateFinalGoal({ ...editingGoal, title: newGoalTitle });
-    } else {
-      await addFinalGoal({
-        id: 'f' + Date.now(),
-        title: newGoalTitle,
-        createdAt: Date.now(),
-      });
-    }
-
-    setIsModalOpen(false);
-    loadGoals();
-  }
-
-  async function removeFinalGoal(id: string) {
-    if (confirm('Supprimer cet objectif final et tous ses objectifs journaliers ?')) {
-      await deleteFinalGoal(id);
-      loadGoals();
-    }
-  }
-
-  function openAddDailyGoal(finalGoalId: string) {
-    setSelectedFinalGoal(finalGoalId);
-    setEditingDailyGoal(null);
-    setNewDailyGoalTitle('');
-    setNewDailyGoalPillar('Business');
-    setNewDailyGoalWeight(3);
-    setIsDailyModalOpen(true);
-  }
-
-  function openEditDailyGoal(goal: DailyGoal) {
-    setSelectedFinalGoal(goal.finalGoalId);
-    setEditingDailyGoal(goal);
-    setNewDailyGoalTitle(goal.title);
-    setNewDailyGoalPillar(goal.pillar);
-    setNewDailyGoalWeight(goal.weight);
-    setIsDailyModalOpen(true);
-  }
-
-  async function saveDailyGoal() {
-    if (!newDailyGoalTitle.trim() || !selectedFinalGoal) return;
-
-    if (editingDailyGoal) {
-      await updateDailyGoal({
-        ...editingDailyGoal,
-        title: newDailyGoalTitle,
-        pillar: newDailyGoalPillar,
-        weight: newDailyGoalWeight,
-      });
-    } else {
-      await addDailyGoal({
-        id: 'd' + Date.now(),
-        title: newDailyGoalTitle,
-        pillar: newDailyGoalPillar,
-        weight: newDailyGoalWeight,
-        finalGoalId: selectedFinalGoal,
-      });
-    }
-
-    setIsDailyModalOpen(false);
-    loadGoals();
-  }
-
-  async function removeDailyGoal(id: string) {
-    if (confirm('Supprimer cet objectif journalier ?')) {
-      await deleteDailyGoal(id);
-      loadGoals();
-    }
-  }
-
-  const greeting = userName ? `Bonjour, ${userName} 👋` : 'Bonjour 👋';
+  const greeting = userName ? `Bonjour, ${userName}` : 'Bonjour';
   const initials = userName ? userName.slice(0, 2).toUpperCase() : '?';
+  const today = toDateStr();
 
   return (
     <div className="goals-page">
@@ -219,136 +165,70 @@ export function Goals() {
 
       {/* ── Goal cards ── */}
       <div className="goals-list">
-        {finalGoals.length === 0 && (
+        {goals.length === 0 && (
           <div className="goals-empty">
             <p>Aucun objectif pour l'instant.</p>
             <p>Appuie sur + pour commencer !</p>
           </div>
         )}
-        {finalGoals.map(fg => {
-          const pct = goalProgress.get(fg.id) ?? 0;
+        {goals.map(goal => {
+          const pct = progressMap.get(goal.id) ?? 0;
           const accent = getAccentVar(pct);
-          const dgs = dailyGoalsByFinal.get(fg.id) ?? [];
-          const isExpanded = expandedGoalId === fg.id;
+          const info = TYPE_INFO[goal.measureType];
+          const done = todayDone(goal.id);
+          const total = todayTotal(goal.id);
+          const isLate = !!goal.targetDate && goal.targetDate < today && pct < 100;
+          const allDoneToday = total > 0 && done === total;
+
           return (
             <div
-              key={fg.id}
+              key={goal.id}
               className="goal-card"
               style={{ borderLeftColor: accent }}
-              onClick={() => setExpandedGoalId(isExpanded ? null : fg.id)}
+              onClick={() => navigate(`/goals/${goal.id}`)}
             >
               <div className="goal-card-main">
                 <div className="goal-card-info">
-                  <span className="goal-card-title">{fg.title}</span>
-                  <span className="goal-card-meta">
-                    {dgs.length} obj. journalier{dgs.length !== 1 ? 's' : ''} · 30 derniers jours
-                  </span>
+                  <div className="goal-card-head-row">
+                    <span className="goal-card-title">{goal.title}</span>
+                    <div
+                      className="goal-type-badge"
+                      style={{ background: info.color }}
+                    >{info.abbr}</div>
+                  </div>
+                  {total > 0 && (
+                    <span className={`goal-today-actions ${allDoneToday ? 'goal-today-all-done' : ''}`}>
+                      {allDoneToday ? '✓ Toutes les actions faites' : `${done}/${total} actions aujourd'hui`}
+                    </span>
+                  )}
+                  {isLate && <span className="goal-late-badge">En retard</span>}
                   <div className="goal-card-bar">
                     <div className="goal-card-bar-fill" style={{ width: `${pct}%`, background: accent }} />
                   </div>
                 </div>
                 <div className="goal-card-right">
                   <span className="goal-card-pct" style={{ color: accent }}>{pct}%</span>
-                  <div className="goal-card-actions" onClick={e => e.stopPropagation()}>
-                    <button className="goal-icon-btn" onClick={() => openEditFinalGoal(fg)} title="Modifier"><PencilIcon /></button>
-                    <button className="goal-icon-btn" onClick={() => removeFinalGoal(fg.id)} title="Supprimer"><TrashIcon /></button>
-                  </div>
                 </div>
               </div>
-
-              {isExpanded && (
-                <div className="goal-expanded" onClick={e => e.stopPropagation()}>
-                  <div className="daily-header">
-                    <span className="daily-header-label">Objectifs journaliers</span>
-                    <Button size="small" onClick={() => openAddDailyGoal(fg.id)}>+ Ajouter</Button>
-                  </div>
-                  {dgs.length === 0 ? (
-                    <p className="empty-state">Aucun objectif journalier</p>
-                  ) : (
-                    <div className="daily-list">
-                      {dgs.map(dg => (
-                        <div key={dg.id} className="daily-item">
-                          <div className="daily-item-info">
-                            <span className="daily-item-title">{dg.title}</span>
-                            <span className={`daily-goal-pillar pillar-${dg.pillar.toLowerCase()}`}>{dg.pillar}</span>
-                            <span className="daily-item-weight">×{dg.weight}</span>
-                          </div>
-                          <div className="daily-item-actions">
-                            <button className="goal-icon-btn" onClick={() => openEditDailyGoal(dg)}><PencilIcon /></button>
-                            <button className="goal-icon-btn" onClick={() => removeDailyGoal(dg.id)}><TrashIcon /></button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           );
         })}
       </div>
 
       {/* ── FAB ── */}
-      <button className="goals-fab" onClick={openAddFinalGoal} aria-label="Nouvel objectif">
+      <button className="goals-fab" onClick={() => setIsCreateOpen(true)} aria-label="Nouvel objectif">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="26" height="26">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
       </button>
 
-      {/* ── Modals ── */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingGoal ? 'Modifier l\'objectif' : 'Nouvel objectif'}>
-        <div className="form-group">
-          <label>Titre</label>
-          <input
-            type="text"
-            value={newGoalTitle}
-            onChange={e => setNewGoalTitle(e.target.value)}
-            placeholder="Ex: 100k CA"
-            autoFocus
-          />
-        </div>
-        <div className="modal-actions">
-          <Button onClick={saveFinalGoal}>Enregistrer</Button>
-          <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-        </div>
-      </Modal>
-
-      <Modal isOpen={isDailyModalOpen} onClose={() => setIsDailyModalOpen(false)} title={editingDailyGoal ? 'Modifier' : 'Nouvel objectif journalier'}>
-        <div className="form-group">
-          <label>Titre</label>
-          <input
-            type="text"
-            value={newDailyGoalTitle}
-            onChange={e => setNewDailyGoalTitle(e.target.value)}
-            placeholder="Ex: 1 action business"
-            autoFocus
-          />
-        </div>
-        <div className="form-group">
-          <label>Pilier</label>
-          <select value={newDailyGoalPillar} onChange={e => setNewDailyGoalPillar(e.target.value as Pillar)}>
-            <option value="Business">Business</option>
-            <option value="Structure">Structure</option>
-            <option value="Corps">Corps</option>
-            <option value="Vision">Vision</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Poids (1–5)</label>
-          <input
-            type="number"
-            min="1"
-            max="5"
-            value={newDailyGoalWeight}
-            onChange={e => setNewDailyGoalWeight(Number(e.target.value))}
-          />
-        </div>
-        <div className="modal-actions">
-          <Button onClick={saveDailyGoal}>Enregistrer</Button>
-          <Button variant="secondary" onClick={() => setIsDailyModalOpen(false)}>Annuler</Button>
-        </div>
-      </Modal>
+      <GoalCreateModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSaved={() => { setIsCreateOpen(false); loadData(); }}
+      />
     </div>
   );
 }
+

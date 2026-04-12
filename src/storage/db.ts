@@ -1,59 +1,52 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { DailyGoal, FinalGoal, DailyEntry, RoadmapPhase, RoadmapItem } from '../types';
+import { DailyGoal, FinalGoal, DailyEntry, RoadmapPhase, RoadmapItem, Goal, DailyAction, GoalEntry, ActionCompletion } from '../types';
 
 interface GoalTrackerDB extends DBSchema {
-  finalGoals: {
-    key: string;
-    value: FinalGoal;
-  };
-  dailyGoals: {
-    key: string;
-    value: DailyGoal;
-    indexes: { 'by-final-goal': string };
-  };
-  dailyEntries: {
-    key: string;
-    value: DailyEntry;
-    indexes: { 'by-date': string };
-  };
-  roadmapPhases: {
-    key: string;
-    value: RoadmapPhase;
-  };
-  roadmapItems: {
-    key: string;
-    value: RoadmapItem;
-    indexes: { 'by-phase': string };
-  };
+  finalGoals: { key: string; value: FinalGoal };
+  dailyGoals: { key: string; value: DailyGoal; indexes: { 'by-final-goal': string } };
+  dailyEntries: { key: string; value: DailyEntry; indexes: { 'by-date': string } };
+  roadmapPhases: { key: string; value: RoadmapPhase };
+  roadmapItems: { key: string; value: RoadmapItem; indexes: { 'by-phase': string } };
+  goals: { key: string; value: Goal };
+  dailyActions: { key: string; value: DailyAction; indexes: { 'by-goal': string } };
+  goalEntries: { key: string; value: GoalEntry; indexes: { 'by-goal': string } };
+  actionCompletions: { key: string; value: ActionCompletion; indexes: { 'by-goal': string; 'by-date': string; 'by-action': string } };
 }
 
 let dbPromise: Promise<IDBPDatabase<GoalTrackerDB>> | null = null;
 
 export function getDB(): Promise<IDBPDatabase<GoalTrackerDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<GoalTrackerDB>('goal-tracker', 3, {
+    dbPromise = openDB<GoalTrackerDB>('goal-tracker', 4, {
       upgrade(db) {
-        if (!db.objectStoreNames.contains('finalGoals')) {
-          db.createObjectStore('finalGoals', { keyPath: 'id' });
-        }
-
+        if (!db.objectStoreNames.contains('finalGoals')) db.createObjectStore('finalGoals', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('dailyGoals')) {
-          const dailyGoalsStore = db.createObjectStore('dailyGoals', { keyPath: 'id' });
-          dailyGoalsStore.createIndex('by-final-goal', 'finalGoalId');
+          const s = db.createObjectStore('dailyGoals', { keyPath: 'id' });
+          s.createIndex('by-final-goal', 'finalGoalId');
         }
-
         if (!db.objectStoreNames.contains('dailyEntries')) {
-          const dailyEntriesStore = db.createObjectStore('dailyEntries', { keyPath: 'id' });
-          dailyEntriesStore.createIndex('by-date', 'date');
+          const s = db.createObjectStore('dailyEntries', { keyPath: 'id' });
+          s.createIndex('by-date', 'date');
         }
-
-        if (!db.objectStoreNames.contains('roadmapPhases')) {
-          db.createObjectStore('roadmapPhases', { keyPath: 'id' });
-        }
-
+        if (!db.objectStoreNames.contains('roadmapPhases')) db.createObjectStore('roadmapPhases', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('roadmapItems')) {
-          const roadmapItemsStore = db.createObjectStore('roadmapItems', { keyPath: 'id' });
-          roadmapItemsStore.createIndex('by-phase', 'phaseId');
+          const s = db.createObjectStore('roadmapItems', { keyPath: 'id' });
+          s.createIndex('by-phase', 'phaseId');
+        }
+        if (!db.objectStoreNames.contains('goals')) db.createObjectStore('goals', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('dailyActions')) {
+          const s = db.createObjectStore('dailyActions', { keyPath: 'id' });
+          s.createIndex('by-goal', 'goalId');
+        }
+        if (!db.objectStoreNames.contains('goalEntries')) {
+          const s = db.createObjectStore('goalEntries', { keyPath: 'id' });
+          s.createIndex('by-goal', 'goalId');
+        }
+        if (!db.objectStoreNames.contains('actionCompletions')) {
+          const s = db.createObjectStore('actionCompletions', { keyPath: 'id' });
+          s.createIndex('by-goal', 'goalId');
+          s.createIndex('by-date', 'date');
+          s.createIndex('by-action', 'actionId');
         }
       },
     });
@@ -113,13 +106,17 @@ export async function getRoadmapItems(): Promise<RoadmapItem[]> {
 export async function exportAllData(): Promise<string> {
   const db = await getDB();
   const data = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     finalGoals: await db.getAll('finalGoals'),
     dailyGoals: await db.getAll('dailyGoals'),
     dailyEntries: await db.getAll('dailyEntries'),
     roadmapPhases: await db.getAll('roadmapPhases'),
     roadmapItems: await db.getAll('roadmapItems'),
+    goals: await db.getAll('goals'),
+    dailyActions: await db.getAll('dailyActions'),
+    goalEntries: await db.getAll('goalEntries'),
+    actionCompletions: await db.getAll('actionCompletions'),
   };
   return JSON.stringify(data, null, 2);
 }
@@ -127,24 +124,16 @@ export async function exportAllData(): Promise<string> {
 export async function importAllData(json: string): Promise<void> {
   const data = JSON.parse(json);
   const db = await getDB();
-
   const tx = db.transaction(
-    ['finalGoals', 'dailyGoals', 'dailyEntries', 'roadmapPhases', 'roadmapItems'],
+    ['finalGoals', 'dailyGoals', 'dailyEntries', 'roadmapPhases', 'roadmapItems',
+     'goals', 'dailyActions', 'goalEntries', 'actionCompletions'],
     'readwrite'
   );
-
-  await tx.objectStore('finalGoals').clear();
-  await tx.objectStore('dailyGoals').clear();
-  await tx.objectStore('dailyEntries').clear();
-  await tx.objectStore('roadmapPhases').clear();
-  await tx.objectStore('roadmapItems').clear();
-
-  for (const item of data.finalGoals ?? []) await tx.objectStore('finalGoals').add(item);
-  for (const item of data.dailyGoals ?? []) await tx.objectStore('dailyGoals').add(item);
-  for (const item of data.dailyEntries ?? []) await tx.objectStore('dailyEntries').add(item);
-  for (const item of data.roadmapPhases ?? []) await tx.objectStore('roadmapPhases').add(item);
-  for (const item of data.roadmapItems ?? []) await tx.objectStore('roadmapItems').add(item);
-
+  for (const store of ['finalGoals','dailyGoals','dailyEntries','roadmapPhases','roadmapItems',
+                        'goals','dailyActions','goalEntries','actionCompletions'] as const) {
+    await tx.objectStore(store).clear();
+    for (const item of data[store] ?? []) await tx.objectStore(store).add(item);
+  }
   await tx.done;
 }
 
@@ -212,4 +201,114 @@ export async function getDailyEntriesInRange(startDate: string, endDate: string)
   const db = await getDB();
   const allEntries = await db.getAll('dailyEntries');
   return allEntries.filter(e => e.date >= startDate && e.date <= endDate);
+}
+
+// ── Goals ────────────────────────────────────────────────
+export async function getGoals(): Promise<Goal[]> {
+  const db = await getDB();
+  return db.getAll('goals');
+}
+
+export async function getGoalById(id: string): Promise<Goal | undefined> {
+  const db = await getDB();
+  return db.get('goals', id);
+}
+
+export async function addGoal(goal: Goal): Promise<void> {
+  const db = await getDB();
+  await db.add('goals', goal);
+}
+
+export async function updateGoal(goal: Goal): Promise<void> {
+  const db = await getDB();
+  await db.put('goals', goal);
+}
+
+export async function deleteGoal(id: string): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction(['goals', 'dailyActions', 'goalEntries', 'actionCompletions'], 'readwrite');
+  await tx.objectStore('goals').delete(id);
+  const actionKeys = await tx.objectStore('dailyActions').index('by-goal').getAllKeys(id);
+  for (const k of actionKeys) await tx.objectStore('dailyActions').delete(k);
+  const entryKeys = await tx.objectStore('goalEntries').index('by-goal').getAllKeys(id);
+  for (const k of entryKeys) await tx.objectStore('goalEntries').delete(k);
+  const compKeys = await tx.objectStore('actionCompletions').index('by-goal').getAllKeys(id);
+  for (const k of compKeys) await tx.objectStore('actionCompletions').delete(k);
+  await tx.done;
+}
+
+// ── DailyActions ─────────────────────────────────────────
+export async function getDailyActionsByGoal(goalId: string): Promise<DailyAction[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('dailyActions', 'by-goal', goalId);
+}
+
+export async function getAllDailyActions(): Promise<DailyAction[]> {
+  const db = await getDB();
+  return db.getAll('dailyActions');
+}
+
+export async function addDailyAction(action: DailyAction): Promise<void> {
+  const db = await getDB();
+  await db.add('dailyActions', action);
+}
+
+export async function deleteDailyAction(id: string): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction(['dailyActions', 'actionCompletions'], 'readwrite');
+  await tx.objectStore('dailyActions').delete(id);
+  const keys = await tx.objectStore('actionCompletions').index('by-action').getAllKeys(id);
+  for (const k of keys) await tx.objectStore('actionCompletions').delete(k);
+  await tx.done;
+}
+
+// ── GoalEntries ───────────────────────────────────────────
+export async function getGoalEntriesByGoal(goalId: string): Promise<GoalEntry[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('goalEntries', 'by-goal', goalId);
+}
+
+export async function addGoalEntry(entry: GoalEntry): Promise<void> {
+  const db = await getDB();
+  await db.add('goalEntries', entry);
+}
+
+// ── ActionCompletions ─────────────────────────────────────
+export async function getActionCompletionsForDate(date: string): Promise<ActionCompletion[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('actionCompletions', 'by-date', date);
+}
+
+export async function getActionCompletionsByGoal(goalId: string): Promise<ActionCompletion[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('actionCompletions', 'by-goal', goalId);
+}
+
+export async function getActionCompletionsInRange(start: string, end: string): Promise<ActionCompletion[]> {
+  const db = await getDB();
+  const all = await db.getAll('actionCompletions');
+  return all.filter(c => c.date >= start && c.date <= end);
+}
+
+export async function saveActionCompletion(completion: ActionCompletion): Promise<void> {
+  const db = await getDB();
+  await db.put('actionCompletions', completion);
+}
+
+// ── Sync DailyEntry from ActionCompletions (for Insights) ─
+export async function syncDailyEntry(date: string): Promise<void> {
+  const db = await getDB();
+  const allActions = await db.getAll('dailyActions');
+  const completions = await db.getAllFromIndex('actionCompletions', 'by-date', date);
+  const completedIds = completions.filter(c => c.completed).map(c => c.actionId);
+  const score = allActions.length > 0 ? Math.round((completedIds.length / allActions.length) * 100) : 0;
+  const existing = await db.getFromIndex('dailyEntries', 'by-date', date);
+  await db.put('dailyEntries', {
+    id: existing?.id ?? date,
+    date,
+    completedGoalIds: completedIds,
+    score,
+    note: existing?.note ?? '',
+    validated: existing?.validated ?? false,
+  });
 }

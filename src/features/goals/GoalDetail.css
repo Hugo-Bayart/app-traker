@@ -1,0 +1,407 @@
+.goal-detail-page {
+  min-height: 100dvh;
+  background: var(--clr-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-detail-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  color: var(--clr-text-secondary);
+  font-size: 15px;
+}
+
+/* ── Header ── */
+.goal-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--clr-bg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.goal-detail-back {
+  background: none;
+  border: none;
+  color: var(--clr-text);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.goal-detail-header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.goal-detail-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-title, 'Inter', sans-serif);
+  text-transform: var(--title-transform, none);
+}
+
+.goal-detail-type-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  flex-shrink: 0;
+}
+
+.goal-detail-delete {
+  background: none;
+  border: none;
+  color: var(--clr-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.goal-detail-delete:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ── Body ── */
+.goal-detail-body {
+  flex: 1;
+  padding: 0 0 calc(32px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Hero ── */
+.goal-detail-hero {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.goal-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.goal-hero-pct {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--clr-text);
+  line-height: 1;
+  font-family: var(--font-data, 'Inter', sans-serif);
+}
+
+.goal-late-badge {
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill, 100px);
+  border: 1px solid #FCD34D;
+}
+
+.goal-update-btn {
+  margin-left: auto;
+  background: var(--clr-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn, 12px);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.goal-update-btn:active {
+  opacity: 0.75;
+}
+
+.goal-hero-bar {
+  height: 8px;
+  border-radius: 100px;
+  background: var(--clr-border);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.goal-hero-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+.goal-hero-value {
+  font-size: 14px;
+  color: var(--clr-text-secondary);
+  margin: 0 0 4px;
+}
+
+.goal-hero-value strong {
+  color: var(--clr-text);
+  font-weight: 700;
+}
+
+.goal-hero-date {
+  font-size: 12px;
+  color: var(--clr-text-muted, var(--clr-text-secondary));
+  margin: 0;
+}
+
+/* ── Section ── */
+.goal-detail-section {
+  padding: 20px 20px 4px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.goal-detail-section:last-child {
+  border-bottom: none;
+}
+
+.goal-detail-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--clr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px;
+  font-family: var(--font-title, 'Inter', sans-serif);
+}
+
+/* ── Stats grid ── */
+.goal-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.goal-stat-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md, 14px);
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goal-stat-label {
+  font-size: 11px;
+  color: var(--clr-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.goal-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--clr-text);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  line-height: 1.1;
+}
+
+/* ── Today's actions ── */
+.goal-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.goal-action-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px;
+  background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md, 14px);
+  cursor: pointer;
+  transition: border-color 0.15s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.goal-action-item.done {
+  border-color: var(--clr-primary);
+  opacity: 0.7;
+}
+
+.goal-action-check {
+  color: var(--clr-text-secondary);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.goal-action-item.done .goal-action-check {
+  color: var(--clr-primary);
+}
+
+.goal-action-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--clr-text);
+}
+
+.goal-action-item.done .goal-action-title {
+  text-decoration: line-through;
+  color: var(--clr-text-secondary);
+}
+
+.goal-action-delete {
+  background: none;
+  border: none;
+  color: var(--clr-text-muted, var(--clr-text-secondary));
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.goal-action-delete:hover {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.goal-no-actions {
+  padding: 8px 0 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.goal-no-actions p {
+  font-size: 14px;
+  color: var(--clr-text-secondary);
+  margin: 0;
+}
+
+.goal-add-action-btn {
+  background: none;
+  border: 1.5px dashed var(--clr-border);
+  color: var(--clr-primary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 10px 16px;
+  border-radius: var(--radius-btn, 12px);
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.goal-add-action-btn:hover {
+  background: var(--clr-primary-light, rgba(99,102,241,0.06));
+  border-color: var(--clr-primary);
+}
+
+/* ── History bars (measurable) ── */
+.goal-history-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.goal-history-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.goal-history-bar-track {
+  width: 100%;
+  height: 80px;
+  background: var(--clr-border);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.goal-history-bar-fill {
+  width: 100%;
+  border-radius: 6px;
+  transition: height 0.4s ease;
+}
+
+.goal-history-bar-val {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--clr-text);
+  font-family: var(--font-data, 'Inter', sans-serif);
+}
+
+.goal-history-bar-date {
+  font-size: 10px;
+  color: var(--clr-text-secondary);
+}
+
+/* ── 21-day calendar (qualitative) ── */
+.goal-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.goal-cal-dot {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--clr-border);
+  transition: background 0.2s;
+}
+
+.goal-cal-dot.partial {
+  background: color-mix(in srgb, var(--clr-primary) 30%, var(--clr-border));
+}
+
+/* .goal-cal-dot.done background is set inline via style prop */

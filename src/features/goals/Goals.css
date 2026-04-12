@@ -345,3 +345,49 @@
 
 .goals-fab:active { transform: scale(0.93); }
 
+/* ── New goal-card subclasses ── */
+.goal-card-head-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.goal-type-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  flex-shrink: 0;
+}
+
+.goal-today-actions {
+  font-size: 11px;
+  color: var(--clr-text-secondary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.goal-today-all-done {
+  color: var(--clr-accent1);
+}
+
+.goal-late-badge {
+  display: inline-block;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill, 100px);
+  border: 1px solid #FCD34D;
+  margin-bottom: 6px;
+}
+
