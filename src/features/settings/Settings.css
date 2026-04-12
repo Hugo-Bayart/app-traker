@@ -1,0 +1,216 @@
+.settings-page {
+  padding: 0 0 100px 0;
+  min-height: 100vh;
+  background: var(--clr-bg);
+}
+
+/* ── Header ── */
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 16px;
+  position: sticky;
+  top: 0;
+  background: var(--clr-bg);
+  z-index: 10;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.settings-back {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--clr-text);
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings-back:hover {
+  background: var(--clr-surface-2);
+}
+
+.settings-back:active {
+  transform: scale(0.92);
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 22px;
+}
+
+/* ── Section ── */
+.settings-section {
+  padding: 24px 20px 0;
+}
+
+.settings-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--clr-text-muted);
+  margin: 0 0 16px 0;
+}
+
+/* ── Theme list ── */
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+}
+
+.theme-card:hover {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light);
+}
+
+.theme-card:active {
+  transform: scale(0.98);
+}
+
+.theme-card--active {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light);
+}
+
+/* ── Theme preview box ── */
+.theme-preview {
+  width: 60px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+}
+
+.theme-preview-bar {
+  height: 6px;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.theme-preview-dots {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.theme-preview-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+}
+
+/* ── Theme info ── */
+.theme-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.theme-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--clr-text);
+  font-family: var(--font-title), 'Inter', sans-serif;
+  text-transform: var(--title-transform, none);
+}
+
+.theme-desc {
+  font-size: 12px;
+  color: var(--clr-text-secondary);
+}
+
+/* ── Checkmark ── */
+.theme-check {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--clr-surface);
+  background: transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.theme-check--active {
+  background: var(--clr-primary);
+  border-color: var(--clr-primary);
+}
+
+/* ── Compte section ── */
+.settings-card {
+  background: var(--clr-surface);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.settings-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--clr-text-muted);
+  margin-bottom: 8px;
+  font-family: var(--font-data), 'Inter', sans-serif;
+}
+
+.settings-field-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-data), 'Inter', sans-serif;
+  font-size: 15px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.settings-field-input:focus {
+  outline: none;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light);
+}
+
+.settings-field-input::placeholder {
+  color: var(--clr-text-muted);
+}
+

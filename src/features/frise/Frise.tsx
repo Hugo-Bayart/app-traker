@@ -9,6 +9,7 @@ import {
   addRoadmapItem, deleteRoadmapItem,
 } from '../../storage/db';
 import { RoadmapPhase, RoadmapItem } from '../../types';
+import { PencilIcon, TrashIcon } from '../../components/Icons';
 import './Frise.css';
 
 export function Frise() {
@@ -153,13 +154,13 @@ export function Frise() {
   return (
     <div className="frise-page">
       <div className="frise-header">
-        <h1>🗺️ Frise</h1>
+        <h1>Frise</h1>
         <Button
           variant={editMode ? 'danger' : 'secondary'}
           size="small"
           onClick={() => { setEditMode(m => !m); setEditingItem(null); }}
         >
-          {editMode ? 'Terminer' : '✏️ Éditer'}
+          {editMode ? 'Terminer' : 'Éditer'}
         </Button>
       </div>
 
@@ -191,8 +192,8 @@ export function Frise() {
                 <div className="phase-progress">
                   {editMode ? (
                     <div className="phase-edit-actions">
-                      <button className="icon-btn" onClick={e => openEditPhase(phase, e)} title="Modifier">✏️</button>
-                      <button className="icon-btn icon-btn--danger" onClick={e => handleDeletePhase(phase.id, e)} title="Supprimer">🗑️</button>
+                      <button className="icon-btn" onClick={e => openEditPhase(phase, e)} title="Modifier"><PencilIcon /></button>
+                      <button className="icon-btn icon-btn--danger" onClick={e => handleDeletePhase(phase.id, e)} title="Supprimer"><TrashIcon /></button>
                     </div>
                   ) : (
                     <div className="progress-number">{stats.completed}/{stats.total}</div>
@@ -239,7 +240,7 @@ export function Frise() {
                               {item.title}
                             </span>
                             {editMode && (
-                              <button className="icon-btn icon-btn--danger icon-btn--sm" onClick={e => handleDeleteItem(item.id, e)}>🗑️</button>
+                              <button className="icon-btn icon-btn--danger icon-btn--sm" onClick={e => handleDeleteItem(item.id, e)}><TrashIcon /></button>
                             )}
                           </>
                         )}

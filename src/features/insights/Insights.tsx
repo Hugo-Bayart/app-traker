@@ -4,6 +4,8 @@ import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { getDailyEntriesInRange, getDailyGoals } from '../../storage/db';
 import { DailyEntry, DailyGoal } from '../../types';
+import { useTheme } from '../../contexts/ThemeContext';
+import { InfoIcon, CheckIcon, CircleIcon } from '../../components/Icons';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -28,6 +30,7 @@ export function Insights() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dailyGoals, setDailyGoals] = useState<DailyGoal[]>([]);
   const [showHelp, setShowHelp] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     loadData();
@@ -64,8 +67,8 @@ export function Insights() {
       {
         label: 'Score',
         data: scores,
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        borderColor: theme.vars.accent1,
+        backgroundColor: theme.vars.primaryLight,
         fill: true,
         tension: 0.4,
       },
@@ -122,8 +125,8 @@ export function Insights() {
   return (
     <div className="insights-page">
       <div className="insights-header">
-        <h1>📊 Suivi</h1>
-        <button className="help-button" onClick={() => setShowHelp(true)}>ℹ️</button>
+        <h1>Suivi</h1>
+        <button className="help-button" onClick={() => setShowHelp(true)}><InfoIcon size={18} /></button>
       </div>
 
       <Card>
@@ -182,7 +185,7 @@ export function Insights() {
             <ul className="day-detail-goals">
               {dailyGoals.map(goal => (
                 <li key={goal.id} className={selectedEntry.completedGoalIds.includes(goal.id) ? 'completed' : 'incomplete'}>
-                  {selectedEntry.completedGoalIds.includes(goal.id) ? '✓' : '○'} {goal.title}
+                  <span className="goal-status-icon">{selectedEntry.completedGoalIds.includes(goal.id) ? <CheckIcon size={13} /> : <CircleIcon size={13} />}</span> {goal.title}
                 </li>
               ))}
             </ul>

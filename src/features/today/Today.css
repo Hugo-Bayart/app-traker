@@ -23,55 +23,61 @@
 
 .date-picker {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 14px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .date-picker:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light);
 }
 
 .date-indicator {
-  background: #fef3c7;
+  background: var(--clr-warning-light);
   color: #92400e;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 16px;
-  font-size: 14px;
+  font-size: 13px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .score-badge {
-  background: #6366f1;
+  background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-hover));
   color: white;
-  font-size: 24px;
-  font-weight: 700;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  font-size: 22px;
+  font-weight: var(--data-weight, 700);
+  font-family: var(--font-data), 'Inter', sans-serif;
+  width: 62px;
+  height: 62px;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-primary);
 }
 
 .score-text {
   text-align: center;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  color: #374151;
+  color: var(--clr-text-secondary);
   margin: 12px 0 0 0;
 }
 
 .checklist {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   margin-top: 16px;
 }
 
@@ -79,71 +85,83 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: #f9fafb;
-  border-radius: 8px;
+  padding: 14px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .checklist-item:hover {
-  background: #f3f4f6;
+  border-color: var(--clr-primary-light);
+  box-shadow: var(--shadow-xs);
 }
 
 .checklist-item input[type="checkbox"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
+  accent-color: var(--clr-primary);
+  flex-shrink: 0;
 }
 
 .checklist-title {
   flex: 1;
   font-weight: 500;
+  font-size: 14px;
 }
 
 .checklist-pillar {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 600;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .checklist-weight {
   font-size: 12px;
-  color: #6b7280;
-  background: white;
-  padding: 2px 8px;
-  border-radius: 4px;
+  color: var(--clr-text-muted);
+  background: var(--clr-surface-2);
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
 }
 
 .note-input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 14px;
   resize: vertical;
   margin-top: 12px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .note-input:focus {
   outline: none;
-  border-color: #6366f1;
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-light);
 }
 
 .note-input:disabled {
-  background: #f3f4f6;
+  background: var(--clr-surface-2);
   cursor: not-allowed;
 }
 
 .checklist-item.disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .checklist-item.disabled:hover {
-  background: #f9fafb;
+  border-color: var(--clr-border);
+  box-shadow: none;
 }
 
 .checklist-item input[type="checkbox"]:disabled {
@@ -152,47 +170,49 @@
 
 .validate-button {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom, 0px) + 12px);
   left: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, var(--clr-primary), var(--clr-primary-hover));
   color: white;
   border: none;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   padding: 18px;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: var(--title-weight, 700);
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 28px var(--clr-primary-shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
   z-index: 50;
+  letter-spacing: 0.02em;
+  font-family: var(--font-title), 'Inter', sans-serif;
 }
 
 .validate-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 12px 36px var(--clr-primary-shadow);
 }
 
 .validate-button:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  transform: scale(0.97);
+  box-shadow: 0 4px 16px var(--clr-primary-shadow);
 }
 
 .validation-message {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom, 0px) + 12px);
   left: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, var(--clr-success), #059669);
   color: white;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   padding: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-  animation: slideUp 0.4s ease-out;
+  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.35);
+  animation: slideUp 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
   z-index: 50;
 }
 

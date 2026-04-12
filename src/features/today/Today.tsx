@@ -4,6 +4,7 @@ import { Progress } from '../../components/Progress';
 import { Button } from '../../components/Button';
 import { getDailyGoals, getDailyEntry, saveDailyEntry } from '../../storage/db';
 import { DailyGoal, DailyEntry } from '../../types';
+import { CheckCircleIcon } from '../../components/Icons';
 import './Today.css';
 
 function safeAddDays(dateStr: string, days: number): string {
@@ -135,7 +136,7 @@ export function Today() {
   return (
     <div className="today-page">
       <div className="today-header">
-        <h1>✓ Aujourd'hui</h1>
+        <h1>Aujourd'hui</h1>
         <div className="score-badge">{score}</div>
       </div>
 
@@ -148,7 +149,7 @@ export function Today() {
         />
         {selectedDate !== today && (
           <Button size="small" onClick={goToToday}>
-            📅 Aujourd'hui
+            Aujourd'hui
           </Button>
         )}
       </div>
@@ -197,7 +198,7 @@ export function Today() {
 
       {showValidationMessage && (
         <div className="validation-message">
-          <span className="validation-icon">✅</span>
+          <span className="validation-icon"><CheckCircleIcon size={24} /></span>
           <span className="validation-text">Journée validée – Score {score}/100</span>
         </div>
       )}
