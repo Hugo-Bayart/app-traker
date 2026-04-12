@@ -214,3 +214,57 @@
   color: var(--clr-text-muted);
 }
 
+/* ── Backup section ── */
+.backup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.backup-desc {
+  font-size: 13px;
+  color: var(--clr-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.backup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.backup-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-btn, 12px);
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-title), 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backup-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+.backup-btn--export {
+  background: var(--clr-primary);
+  color: #fff;
+}
+
+.backup-btn--import {
+  background: var(--clr-surface-2);
+  color: var(--clr-text);
+  border: 1.5px solid var(--clr-border);
+}
+
+.backup-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--clr-accent1);
+  margin: 0;
+  text-align: center;
+}
+

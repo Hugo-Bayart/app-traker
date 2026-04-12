@@ -110,6 +110,44 @@ export async function getRoadmapItems(): Promise<RoadmapItem[]> {
   return db.getAll('roadmapItems');
 }
 
+export async function exportAllData(): Promise<string> {
+  const db = await getDB();
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    finalGoals: await db.getAll('finalGoals'),
+    dailyGoals: await db.getAll('dailyGoals'),
+    dailyEntries: await db.getAll('dailyEntries'),
+    roadmapPhases: await db.getAll('roadmapPhases'),
+    roadmapItems: await db.getAll('roadmapItems'),
+  };
+  return JSON.stringify(data, null, 2);
+}
+
+export async function importAllData(json: string): Promise<void> {
+  const data = JSON.parse(json);
+  const db = await getDB();
+
+  const tx = db.transaction(
+    ['finalGoals', 'dailyGoals', 'dailyEntries', 'roadmapPhases', 'roadmapItems'],
+    'readwrite'
+  );
+
+  await tx.objectStore('finalGoals').clear();
+  await tx.objectStore('dailyGoals').clear();
+  await tx.objectStore('dailyEntries').clear();
+  await tx.objectStore('roadmapPhases').clear();
+  await tx.objectStore('roadmapItems').clear();
+
+  for (const item of data.finalGoals ?? []) await tx.objectStore('finalGoals').add(item);
+  for (const item of data.dailyGoals ?? []) await tx.objectStore('dailyGoals').add(item);
+  for (const item of data.dailyEntries ?? []) await tx.objectStore('dailyEntries').add(item);
+  for (const item of data.roadmapPhases ?? []) await tx.objectStore('roadmapPhases').add(item);
+  for (const item of data.roadmapItems ?? []) await tx.objectStore('roadmapItems').add(item);
+
+  await tx.done;
+}
+
 export async function getFinalGoals(): Promise<FinalGoal[]> {
   const db = await getDB();
   return db.getAll('finalGoals');
