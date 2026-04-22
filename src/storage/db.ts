@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { DailyGoal, FinalGoal, DailyEntry, RoadmapPhase, RoadmapItem, Goal, DailyAction, GoalEntry, ActionCompletion } from '../types';
+import { DailyGoal, FinalGoal, DailyEntry, RoadmapPhase, RoadmapItem, Goal, DailyAction, GoalEntry, ActionCompletion, Dream } from '../types';
 
 interface GoalTrackerDB extends DBSchema {
   finalGoals: { key: string; value: FinalGoal };
@@ -11,13 +11,14 @@ interface GoalTrackerDB extends DBSchema {
   dailyActions: { key: string; value: DailyAction; indexes: { 'by-goal': string } };
   goalEntries: { key: string; value: GoalEntry; indexes: { 'by-goal': string } };
   actionCompletions: { key: string; value: ActionCompletion; indexes: { 'by-goal': string; 'by-date': string; 'by-action': string } };
+  dreams: { key: string; value: Dream };
 }
 
 let dbPromise: Promise<IDBPDatabase<GoalTrackerDB>> | null = null;
 
 export function getDB(): Promise<IDBPDatabase<GoalTrackerDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<GoalTrackerDB>('goal-tracker', 4, {
+    dbPromise = openDB<GoalTrackerDB>('goal-tracker', 5, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('finalGoals')) db.createObjectStore('finalGoals', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('dailyGoals')) {
@@ -48,6 +49,7 @@ export function getDB(): Promise<IDBPDatabase<GoalTrackerDB>> {
           s.createIndex('by-date', 'date');
           s.createIndex('by-action', 'actionId');
         }
+        if (!db.objectStoreNames.contains('dreams')) db.createObjectStore('dreams', { keyPath: 'id' });
       },
     });
   }
@@ -117,6 +119,7 @@ export async function exportAllData(): Promise<string> {
     dailyActions: await db.getAll('dailyActions'),
     goalEntries: await db.getAll('goalEntries'),
     actionCompletions: await db.getAll('actionCompletions'),
+    dreams: await db.getAll('dreams'),
   };
   return JSON.stringify(data, null, 2);
 }
@@ -126,11 +129,11 @@ export async function importAllData(json: string): Promise<void> {
   const db = await getDB();
   const tx = db.transaction(
     ['finalGoals', 'dailyGoals', 'dailyEntries', 'roadmapPhases', 'roadmapItems',
-     'goals', 'dailyActions', 'goalEntries', 'actionCompletions'],
+     'goals', 'dailyActions', 'goalEntries', 'actionCompletions', 'dreams'],
     'readwrite'
   );
   for (const store of ['finalGoals','dailyGoals','dailyEntries','roadmapPhases','roadmapItems',
-                        'goals','dailyActions','goalEntries','actionCompletions'] as const) {
+                        'goals','dailyActions','goalEntries','actionCompletions','dreams'] as const) {
     await tx.objectStore(store).clear();
     for (const item of data[store] ?? []) await tx.objectStore(store).add(item);
   }
@@ -293,6 +296,28 @@ export async function getActionCompletionsInRange(start: string, end: string): P
 export async function saveActionCompletion(completion: ActionCompletion): Promise<void> {
   const db = await getDB();
   await db.put('actionCompletions', completion);
+}
+
+// ── Dreams ───────────────────────────────────────────────
+export async function getDreams(): Promise<Dream[]> {
+  const db = await getDB();
+  const all = await db.getAll('dreams');
+  return all.sort((a, b) => b.createdAt - a.createdAt);
+}
+
+export async function addDream(dream: Dream): Promise<void> {
+  const db = await getDB();
+  await db.add('dreams', dream);
+}
+
+export async function updateDream(dream: Dream): Promise<void> {
+  const db = await getDB();
+  await db.put('dreams', dream);
+}
+
+export async function deleteDream(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('dreams', id);
 }
 
 // ── Sync DailyEntry from ActionCompletions (for Insights) ─

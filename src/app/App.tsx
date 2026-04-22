@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TabBar } from '../components/TabBar';
+import { Reve } from '../features/reve/Reve';
 import { Goals } from '../features/goals/Goals';
 import { GoalDetail } from '../features/goals/GoalDetail';
 import { Today } from '../features/today/Today';
@@ -15,7 +16,8 @@ function App() {
       <BrowserRouter basename={import.meta.env.BASE_URL}>
         <div className="app">
           <Routes>
-            <Route path="/" element={<Goals />} />
+            <Route path="/" element={<Reve />} />
+            <Route path="/goals" element={<Goals />} />
             <Route path="/goals/:id" element={<GoalDetail />} />
             <Route path="/today" element={<Today />} />
             <Route path="/insights" element={<Insights />} />

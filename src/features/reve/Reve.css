@@ -1,0 +1,389 @@
+/* ── Page ── */
+.reve-page {
+  min-height: 100vh;
+  background: var(--clr-bg);
+  padding-bottom: 120px;
+}
+
+/* ── Header ── */
+.reve-header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #0f0c29, #201f5c 50%, #1a1040);
+  padding: 52px 24px 40px;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+}
+
+.reve-header-content {
+  position: relative;
+  z-index: 2;
+}
+
+.reve-header-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(200, 190, 255, 0.7);
+  font-family: var(--font-data, 'JetBrains Mono', monospace);
+}
+
+.reve-header-title {
+  margin: 8px 0 20px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 0 40px rgba(140, 120, 255, 0.6);
+}
+
+.reve-header-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reve-stat {
+  font-size: 13px;
+  color: rgba(200, 190, 255, 0.75);
+  font-weight: 500;
+}
+
+.reve-stat strong {
+  color: #fff;
+}
+
+.reve-stat--done {
+  color: rgba(180, 255, 200, 0.85);
+}
+
+.reve-stat--done strong {
+  color: #a0f5c0;
+}
+
+/* ── Stars background ── */
+.reve-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reve-star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: reve-twinkle 3s ease-in-out infinite alternate;
+}
+
+@keyframes reve-twinkle {
+  from { opacity: var(--base-op, 0.3); transform: scale(1); }
+  to   { opacity: 1; transform: scale(1.4); }
+}
+
+/* ── Body ── */
+.reve-body {
+  padding: 24px 16px 0;
+}
+
+/* ── Empty state ── */
+.reve-empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.reve-empty-icon {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.reve-empty-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin: 0 0 8px;
+}
+
+.reve-empty-sub {
+  font-size: 14px;
+  color: var(--clr-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Section ── */
+.reve-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.reve-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--clr-text-muted);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+/* ── Dream card ── */
+.dream-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--clr-surface);
+  border-radius: var(--radius-card, 16px);
+  padding: 16px;
+  border: 1.5px solid var(--clr-border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.dream-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(140, 120, 255, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.dream-card:active {
+  transform: scale(0.98);
+}
+
+.dream-card--done {
+  opacity: 0.55;
+}
+
+.dream-card--done .dream-card-title {
+  text-decoration: line-through;
+  color: var(--clr-text-muted);
+}
+
+/* ── Card check button (emoji) ── */
+.dream-card-check {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(140deg, #1a1050, #2a1080);
+  border: 2px solid rgba(140, 120, 255, 0.3);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+  box-shadow: 0 2px 12px rgba(100, 80, 200, 0.25);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dream-card-check:active {
+  transform: scale(0.88);
+}
+
+.dream-card--done .dream-card-check {
+  background: linear-gradient(140deg, #0a2a18, #0d3d20);
+  border-color: rgba(50, 200, 100, 0.4);
+}
+
+.dream-card-emoji {
+  line-height: 1;
+}
+
+.dream-card-check-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 180, 90, 0.65);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── Card body ── */
+.dream-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dream-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--clr-text);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.dream-card-desc {
+  font-size: 12px;
+  color: var(--clr-text-secondary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ── Card delete ── */
+.dream-card-delete {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: var(--clr-text-muted);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dream-card-delete:hover {
+  color: var(--clr-danger);
+  background: var(--clr-danger-light);
+}
+
+/* ── FAB ── */
+.reve-fab {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(140deg, #7c6bff, #a855f7);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(140, 80, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  z-index: 50;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reve-fab:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 10px rgba(140, 80, 255, 0.4);
+}
+
+.reve-fab-icon {
+  font-size: 22px;
+  font-style: normal;
+  line-height: 1;
+}
+
+/* ── Add modal ── */
+.reve-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reve-emoji-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.reve-emoji-preview {
+  font-size: 40px;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(140deg, #1a1050, #2a1080);
+  border: 2px solid rgba(140, 120, 255, 0.3);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reve-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reve-emoji-btn {
+  background: var(--clr-surface-2);
+  border: 1.5px solid var(--clr-border);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.reve-emoji-btn.selected {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-light, #e0e7ff);
+  transform: scale(1.15);
+}
+
+.reve-emoji-btn:active {
+  transform: scale(0.9);
+}
+
+/* ── Form helpers ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--clr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--clr-text-muted);
+}
+
+.form-input {
+  background: var(--clr-surface-2);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--clr-text);
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--clr-primary);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}

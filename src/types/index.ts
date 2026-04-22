@@ -78,3 +78,13 @@ export interface ActionCompletion {
   date: string;                  // "YYYY-MM-DD"
   completed: boolean;
 }
+
+// ── Dreams ───────────────────────────────────────────────
+export interface Dream {
+  id: string;
+  title: string;
+  description?: string;
+  emoji?: string;
+  createdAt: number;
+  accomplished: boolean;
+}

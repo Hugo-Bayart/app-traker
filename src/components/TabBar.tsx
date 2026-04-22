@@ -1,6 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/TabBar.css';
 
+const IconReve = () => (
+  <svg viewBox="0 0 24 24">
+    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+  </svg>
+);
+
 const IconGoals = () => (
   <svg viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="9" />
@@ -42,7 +48,8 @@ export function TabBar() {
   const location = useLocation();
 
   const tabs = [
-    { path: '/', label: 'Objectifs', Icon: IconGoals },
+    { path: '/', label: 'Rêves', Icon: IconReve },
+    { path: '/goals', label: 'Objectifs', Icon: IconGoals },
     { path: '/today', label: "Aujourd'hui", Icon: IconToday },
     { path: '/insights', label: 'Suivi', Icon: IconInsights },
     { path: '/frise', label: 'Frise', Icon: IconFrise },
